@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Laporan Medis</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        padding: 30px;
+        color: #333;
+        line-height: 1.4;
+      }
+      .header {
+        border-bottom: 2px solid #333;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+      }
+      .status-box {
+        padding: 15px;
+        text-align: center;
+        border: 1px solid #ccc;
+        margin-bottom: 20px;
+        border-radius: 5px;
+      }
+      .bg-danger {
+        background: #ffebee;
+        color: #b71c1c;
+        border-color: #ef9a9a;
+      }
+      .bg-warning {
+        background: #fff3e0;
+        color: #e65100;
+        border-color: #ffe0b2;
+      }
+      .bg-success {
+        background: #e8f5e9;
+        color: #1b5e20;
+        border-color: #c8e6c9;
+      }
+      .ai-box {
+        background: #f0f4f8;
+        padding: 15px;
+        border-left: 5px solid #007bff;
+        margin-bottom: 25px;
+        border-radius: 4px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+        margin-bottom: 20px;
+      }
+      th,
+      td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+        vertical-align: top;
+      }
+      th {
+        background: #f5f5f5;
+        width: 45%;
+        font-weight: bold;
+      }
+      .section-header {
+        background-color: #333;
+        color: white;
+        text-align: center;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h2 style="margin: 0">Laporan Kesehatan Urologi</h2>
+      <p style="margin: 5px 0 0 0; font-size: 14px">
+        Pasien: <strong>{{ user.name }}</strong> | Tanggal: {{
+        report.date_posted.strftime('%d-%m-%Y') }}
+      </p>
+    </div>
+
+    <div
+      class="status-box {% if report.total_score >= 5 %}bg-danger{% elif report.total_score >= 3 %}bg-warning{% else %}bg-success{% endif %}"
+    >
+      <h1 style="margin: 0; font-size: 24px">
+        SKOR RISIKO: {{ report.total_score }}
+      </h1>
+      <h3 style="margin: 5px 0 0 0">STATUS: {{ report.risk_level }}</h3>
+    </div>
+
+    <div class="ai-box">
+      <h4 style="margin-top: 0; color: #0056b3">
+        Saran Klinis (AI Generated):
+      </h4>
+      <p style="white-space: pre-line; margin-bottom: 0; text-align: justify">
+        {{ report.ai_advice.strip() }}
+      </p>
+    </div>
+
+    <h3>Rincian Data Pasien Lengkap</h3>
+
+    <table>
+      <tr>
+        <td colspan="2" class="section-header">A. GEJALA KEKAMBUHAN (VITAL)</td>
+      </tr>
+      <tr>
+        <th>1. Hematuria (Darah Urin)</th>
+        <td>
+          {% if report.answers['hematuria'] == '5' %}Kasar/Makroskopis (BAHAYA)
+          {% elif report.answers['hematuria'] == '1' %}Mikroskopis {% else
+          %}Tidak Ada{% endif %}
+        </td>
+      </tr>
+      <tr>
+        <th>2. Urgensi Berkemih</th>
+        <td>Skala {{ report.answers['urgensi'] }} / 5</td>
+      </tr>
+      <tr>
+        <th>3. Frekuensi Siang</th>
+        <td>{{ report.answers['frekuensi_siang'] or '-' }} kali</td>
+      </tr>
+      <tr>
+        <th>4. Nokturia (Malam)</th>
+        <td>{{ report.answers['nokturia'] or '-' }} kali</td>
+      </tr>
+      <tr>
+        <th>5. Disuria (Nyeri BAK)</th>
+        <td>Skala {{ report.answers['disuria'] }} / 5</td>
+      </tr>
+      <tr>
+        <th>6. Rasa Tidak Tuntas</th>
+        <td>{{ report.answers['tidak_tuntas']|title }}</td>
+      </tr>
+      <tr>
+        <th>7. Penurunan Berat Badan</th>
+        <td>
+          {% if report.answers['berat_badan'] == '3' %}> 5 kg (Signifikan) {%
+          elif report.answers['berat_badan'] == '1' %}< 5 kg {% else %}Stabil{%
+          endif %}
+        </td>
+      </tr>
+      <tr>
+        <th>8. Nyeri Tulang</th>
+        <td>
+          {% if report.answers['nyeri_tulang'] == '4' %}Parah/Progresif {% elif
+          report.answers['nyeri_tulang'] == '1' %}Ringan {% else %}Tidak Ada{%
+          endif %}
+        </td>
+      </tr>
+      <tr>
+        <th>9. Kelelahan Ekstrem</th>
+        <td>Skala {{ report.answers['kelelahan'] }} / 5</td>
+      </tr>
+      <tr>
+        <th>10. Nyeri Pelvis</th>
+        <td>Skala {{ report.answers['nyeri_pelvis'] }} / 5</td>
+      </tr>
+      <tr>
+        <th>11. Hematospermia</th>
+        <td>{{ report.answers['hematospermia']|title }}</td>
+      </tr>
+
+      <tr>
+        <td colspan="2" class="section-header">
+          B. MANAJEMEN EFEK SAMPING (KUALITAS HIDUP)
+        </td>
+      </tr>
+      <tr>
+        <th>1. Inkontinensia</th>
+        <td>
+          {{ report.answers['es_inkontinensia']|replace('_', ' ')|title }}
+        </td>
+      </tr>
+      <tr>
+        <th>2. Penggunaan Pad</th>
+        <td>{{ report.answers['es_pad'] or '0' }} buah/hari</td>
+      </tr>
+      <tr>
+        <th>3. Iritasi Kandung Kemih</th>
+        <td>Skala {{ report.answers['es_iritasi'] or '-' }} / 5</td>
+      </tr>
+      <tr>
+        <th>4. Bladder Spasms</th>
+        <td>{{ report.answers['es_spasms']|title }}</td>
+      </tr>
+      <tr>
+        <th>5. Disfungsi Ereksi</th>
+        <td>Skala {{ report.answers['es_ereksi'] or '-' }} / 5</td>
+      </tr>
+      <tr>
+        <th>6. Libido</th>
+        <td>{{ report.answers['es_libido']|title }}</td>
+      </tr>
+      <tr>
+        <th>7. Hot Flashes</th>
+        <td>{{ report.answers['es_hot_flashes'] or '0' }} kali/hari</td>
+      </tr>
+      <tr>
+        <th>8. Perubahan Testis</th>
+        <td>{{ report.answers['es_testis']|title }}</td>
+      </tr>
+      <tr>
+        <th>9. Diare/Pencernaan</th>
+        <td>Skala {{ report.answers['es_diare'] or '-' }} / 5</td>
+      </tr>
+      <tr>
+        <th>10. Perdarahan Rektal</th>
+        <td>{{ report.answers['es_rektal']|title }}</td>
+      </tr>
+      <tr>
+        <th>11. Nyeri Perut</th>
+        <td>Skala {{ report.answers['es_perut'] or '-' }} / 5</td>
+      </tr>
+      <tr>
+        <th>12. Nyeri Pelvis Kronis</th>
+        <td>Skala {{ report.answers['es_pelvis_kronis'] or '-' }} / 5</td>
+      </tr>
+      <tr>
+        <th>13. Neuropati</th>
+        <td>Skala {{ report.answers['es_neuropati'] or '-' }} / 5</td>
+      </tr>
+    </table>
+
+    <p
+      style="margin-top: 30px; font-size: 10px; text-align: center; color: #888"
+    >
+      Dokumen ini digenerate otomatis oleh Sistem Pelacak Kesehatan. <br />
+      Bukan pengganti diagnosis medis profesional.
+    </p>
+  </body>
+</html>

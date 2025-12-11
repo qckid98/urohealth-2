@@ -3,6 +3,10 @@ Flask-SQLAlchemy
 Flask-WTF
 WTForms
 coverage
+Flask-Login
+openai
+weasyprint
+email_validator
 # ecdsa
 # paramiko
 # pycrypto

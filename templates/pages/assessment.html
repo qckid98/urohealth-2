@@ -1,0 +1,182 @@
+{% extends 'layouts/main.html' %} {% block title %}Evaluasi Kesehatan{% endblock
+%} {% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card shadow-sm border-0">
+      <div class="card-header bg-white py-3">
+        <h4 class="card-title mb-0 fw-bold text-primary">
+          <i class="bi bi-clipboard2-pulse"></i> Evaluasi Kesehatan Urologi
+        </h4>
+      </div>
+      <div class="card-body p-4">
+        <form method="POST">
+          {{ form.hidden_tag() }}
+
+          <div class="mb-4">
+            <h5 class="text-danger border-bottom pb-2 mb-3">
+              <i class="bi bi-exclamation-triangle-fill me-2"></i> A. Gejala
+              Kekambuhan (Vital)
+            </h5>
+
+            <div class="mb-3">
+              <label class="form-label fw-medium"
+                >1. Hematuria (Darah dalam Urin)</label
+              >
+              {{ form.hematuria(class="form-select") }}
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label fw-medium">2. Urgensi (1-5)</label>
+                {{ form.urgensi(class="form-control", placeholder="Skala 1-5")
+                }}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-medium"
+                  >5. Disuria/Nyeri (1-5)</label
+                >
+                {{ form.disuria(class="form-control", placeholder="Skala 1-5")
+                }}
+              </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label fw-medium">3. Freq Siang (Kali)</label>
+                {{ form.frekuensi_siang(class="form-control") }}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-medium"
+                  >4. Nokturia/Malam (Kali)</label
+                >
+                {{ form.nokturia(class="form-control") }}
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-medium">6. Rasa Tidak Tuntas</label>
+              {{ form.tidak_tuntas(class="form-select") }}
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-medium"
+                >7. Pengurangan Berat Badan</label
+              >
+              {{ form.berat_badan(class="form-select") }}
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-medium">8. Nyeri Tulang</label>
+              {{ form.nyeri_tulang(class="form-select") }}
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label fw-medium">9. Kelelahan (1-5)</label>
+                {{ form.kelelahan(class="form-control") }}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-medium"
+                  >10. Nyeri Pelvis (1-5)</label
+                >
+                {{ form.nyeri_pelvis(class="form-control") }}
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-medium">11. Hematospermia</label>
+              {{ form.hematospermia(class="form-select") }}
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <h5 class="text-primary border-bottom pb-2 mb-3">
+              <i class="bi bi-activity me-2"></i> B. Manajemen Efek Samping
+            </h5>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-8">
+                <label class="form-label fw-medium">1. Inkontinensia</label>
+                {{ form.es_inkontinensia(class="form-select") }}
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-medium">2. Jml Pad (Harian)</label>
+                {{ form.es_pad(class="form-control") }}
+              </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-6">
+                <label class="form-label fw-medium">3. Iritasi (1-5)</label>
+                {{ form.es_iritasi(class="form-control") }}
+              </div>
+              <div class="col-6">
+                <label class="form-label fw-medium">4. Spasms</label>
+                {{ form.es_spasms(class="form-select") }}
+              </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-6">
+                <label class="form-label fw-medium"
+                  >5. Disfungsi Ereksi (1-5)</label
+                >
+                {{ form.es_ereksi(class="form-control") }}
+              </div>
+              <div class="col-6">
+                <label class="form-label fw-medium">6. Perubahan Libido</label>
+                {{ form.es_libido(class="form-select") }}
+              </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-6">
+                <label class="form-label fw-medium">7. Hot Flashes</label>
+                {{ form.es_hot_flashes(class="form-control") }}
+              </div>
+              <div class="col-6">
+                <label class="form-label fw-medium">8. Perubahan Testis</label>
+                {{ form.es_testis(class="form-select") }}
+              </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-6">
+                <label class="form-label fw-medium">9. Diare (1-5)</label>
+                {{ form.es_diare(class="form-control") }}
+              </div>
+              <div class="col-6">
+                <label class="form-label fw-medium"
+                  >10. Perdarahan Rektal</label
+                >
+                {{ form.es_rektal(class="form-select") }}
+              </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-4">
+                <label class="form-label fw-medium">11. Nyeri Perut</label>
+                {{ form.es_perut(class="form-control") }}
+              </div>
+              <div class="col-4">
+                <label class="form-label fw-medium">12. Pelvis Kronis</label>
+                {{ form.es_pelvis_kronis(class="form-control") }}
+              </div>
+              <div class="col-4">
+                <label class="form-label fw-medium">13. Neuropati</label>
+                {{ form.es_neuropati(class="form-control") }}
+              </div>
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            class="btn btn-success w-100 py-3 fw-bold shadow-sm"
+          >
+            <i class="bi bi-file-earmark-medical-fill me-2"></i> Analisa &
+            Dapatkan Laporan
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

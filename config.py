@@ -1,14 +1,14 @@
+# config.py
 import os
 
-# Grabs the folder where the script runs.
-basedir = os.path.abspath(os.path.dirname(__file__))
+class Config(object):
+    # Kunci rahasia untuk sesi login (wajib ada)
+    SECRET_KEY = os.environ.get('SECRET_KEY') or 'kunci_rahasia_sangat_aman'
 
-# Enable debug mode.
-DEBUG = True
+    # Konfigurasi Database SQLite
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
+        'sqlite:///' + os.path.join(basedir, 'database.db')
 
-# Secret key for session management. You can generate random strings here:
-# https://randomkeygen.com/
-SECRET_KEY = 'my precious'
-
-# Connect to the database
-SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'database.db')
+    # Mematikan notifikasi perubahan database (menghemat memori)
+    SQLALCHEMY_TRACK_MODIFICATIONS = False

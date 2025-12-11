@@ -1,13 +1,45 @@
-{% extends 'layouts/form.html' %}
-{% block title %}Login{% endblock %}
-{% block content %}
-  <form method="post" class="form">
-    <h3 class="form-heading">Login <a href="{{ url_for('home') }}" title="Back to homepage"><i class="fa fa-home pull-right"></i></a></h3>
-    {{ form.name(class_ = 'form-control first-input', placeholder = form.name.label.text, required = true, autofocus = true) }}
-    {{ form.password(class_ = 'form-control last-input', placeholder = form.password.label.text, required = true) }}
-    <p class="pull-left"><a href="{{ url_for('forgot') }}">Forgot Password?</a></p>
-    <p class="pull-right"><a href="{{ url_for('register') }}">Register</a></p>
-    <input type="submit" value="Submit" class="btn btn-primary btn-lg btn-block" disabled>
-    <p>You must add database as well as Flask-Login to enable user management. See the <a href="http://www.realpython.com">Real Python</a> course for more info!</p>
-  </form>
+{% extends 'layouts/form.html' %} {% block title %}Login{% endblock %} {% block
+content %}
+<div class="card p-4">
+  <div class="card-body">
+    <h3 class="mb-4 fw-bold text-primary">
+      <i class="bi bi-heart-pulse-fill"></i> Login
+    </h3>
+
+    <form method="post">
+      {{ form.hidden_tag() }}
+
+      <div class="form-floating mb-3">
+        {{ form.username(class_="form-control", id="floatingInput",
+        placeholder="Username") }}
+        <label for="floatingInput">Username</label>
+      </div>
+
+      <div class="form-floating mb-3">
+        {{ form.password(class_="form-control", id="floatingPassword",
+        placeholder="Password") }}
+        <label for="floatingPassword">Password</label>
+      </div>
+
+      <div class="d-flex justify-content-between mb-3">
+        <a href="#" class="text-decoration-none small text-muted"
+          >Lupa Password?</a
+        >
+      </div>
+
+      <button class="btn btn-primary w-100 mb-3" type="submit">
+        Masuk Sekarang
+      </button>
+
+      <hr class="my-4" />
+
+      <p class="small mb-0">
+        Belum punya akun?
+        <a href="{{ url_for('register') }}" class="text-decoration-none fw-bold"
+          >Daftar di sini</a
+        >
+      </p>
+    </form>
+  </div>
+</div>
 {% endblock %}

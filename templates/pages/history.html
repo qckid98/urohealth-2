@@ -1,0 +1,200 @@
+{% extends 'layouts/main.html' %} {% block title %}Riwayat Kesehatan{% endblock
+%} {% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-10">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2 class="fw-bold mb-0">Riwayat & Grafik Kesehatan</h2>
+      <a href="{{ url_for('assessment') }}" class="btn btn-primary">
+        <i class="bi bi-plus-lg"></i> Evaluasi Baru
+      </a>
+    </div>
+
+    {% if reports %}
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-header bg-white py-3">
+        <h5 class="mb-0 fw-bold text-primary">
+          <i class="bi bi-graph-up"></i> Grafik Skor Gejala (Kualitas Hidup)
+        </h5>
+        <small class="text-muted"
+          >Grafik menunjukkan intensitas keluhan efek samping. Semakin rendah
+          semakin baik.</small
+        >
+      </div>
+      <div class="card-body">
+        <canvas id="healthChart" height="100"></canvas>
+      </div>
+    </div>
+    {% endif %} {% if reports %}
+    <div class="card border-0 shadow-sm">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th class="py-3 ps-4">Tanggal</th>
+              <th class="text-center py-3">Skor Risiko</th>
+              <th class="text-center py-3">Skor Gejala</th>
+              <th class="py-3">Status</th>
+              <th class="text-end py-3 pe-4">Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for report in reports %}
+            <tr>
+              <td class="ps-4">
+                <div class="fw-bold">
+                  {{ report.date_posted.strftime('%d/%m/%Y') }}
+                </div>
+                <div class="small text-muted">
+                  {{ report.date_posted.strftime('%H:%M') }} WIB
+                </div>
+              </td>
+
+              <td class="text-center fs-5 fw-bold text-muted">
+                {{ report.total_score }}
+              </td>
+
+              <td class="text-center">
+                <span
+                  class="badge bg-info text-dark rounded-pill"
+                  style="font-size: 0.9rem"
+                >
+                  {{ report.total_score_kh }}
+                </span>
+              </td>
+
+              <td class="">
+                {% if report.total_score >= 15 %}
+                <span class="badge bg-danger rounded-pill">BAHAYA</span>
+                {% elif report.total_score >= 10 %}
+                <span class="badge bg-warning text-dark rounded-pill"
+                  >WASPADA</span
+                >
+                {% elif report.total_score > 5 %}
+                <span class="badge bg-info text-dark rounded-pill">SIAGA</span>
+                {% else %}
+                <span class="badge bg-success rounded-pill">STABIL</span>
+                {% endif %}
+              </td>
+
+              <td class="text-end pe-4">
+                <a
+                  href="{{ url_for('result', id=report.id) }}"
+                  class="btn btn-sm btn-outline-primary me-1"
+                  ><i class="bi bi-eye"></i
+                ></a>
+                <a
+                  href="{{ url_for('download_pdf', id=report.id) }}"
+                  class="btn btn-sm btn-outline-secondary"
+                  ><i class="bi bi-download"></i
+                ></a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+      <h3 class="fw-bold text-muted">Belum Ada Riwayat</h3>
+      <a
+        href="{{ url_for('assessment') }}"
+        class="btn btn-primary px-4 py-2 mt-3"
+        >Mulai Sekarang</a
+      >
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+{% if reports %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+      // 1. SIAPKAN DATA DARI FLASK (Jinja2 Loop)
+      // Kita balik urutannya (reverse) agar grafik bergerak dari kiri (lama) ke kanan (baru)
+      const labels = [
+          {% for r in reports|reverse %} "{{ r.date_posted.strftime('%d/%m') }}", {% endfor %}
+      ];
+
+      const dataQuality = [
+          {% for r in reports|reverse %} {{ r.total_score_kh }}, {% endfor %}
+      ];
+
+      // Ini data rahasia untuk tooltip (Status Risiko)
+      const riskLevels = [
+          {% for r in reports|reverse %} "{{ r.risk_level }} (Skor Risiko: {{ r.total_score }})", {% endfor %}
+      ];
+
+      const riskColors = [
+          {% for r in reports|reverse %}
+              {% if r.total_score >= 15 %} "#dc3545" // Merah
+              {% elif r.total_score >= 10 %} "#ffc107" // Kuning
+              {% elif r.total_score > 5 %} "#ff7f07ff"
+              {% else %} "#198754" // Hijau
+              {% endif %},
+          {% endfor %}
+      ];
+
+      // 2. CONFIG CHART
+      const ctx = document.getElementById('healthChart').getContext('2d');
+
+      // Bikin Gradient warna biar modern
+      let gradient = ctx.createLinearGradient(0, 0, 0, 400);
+      gradient.addColorStop(0, 'rgba(13, 110, 253, 0.5)'); // Biru transparan atas
+      gradient.addColorStop(1, 'rgba(13, 110, 253, 0.0)'); // Putih transparan bawah
+
+      new Chart(ctx, {
+          type: 'line',
+          data: {
+              labels: labels,
+              datasets: [{
+                  label: 'Skor Keluhan/Efek Samping',
+                  data: dataQuality,
+                  borderColor: '#0d6efd', // Garis Biru
+                  backgroundColor: gradient,
+                  borderWidth: 2,
+                  pointBackgroundColor: riskColors, // Warna titik sesuai RISIKO (Merah/Kuning/Hijau)
+                  pointRadius: 6,
+                  pointHoverRadius: 8,
+                  fill: true,
+                  tension: 0.4 // Garis lengkung halus
+              }]
+          },
+          options: {
+              responsive: true,
+              plugins: {
+                  legend: { display: false },
+                  tooltip: {
+                      backgroundColor: 'rgba(0,0,0,0.8)',
+                      padding: 12,
+                      titleFont: { size: 14 },
+                      bodyFont: { size: 13 },
+                      callbacks: {
+                          // KUSTOMISASI TOOLTIP DI SINI
+                          label: function(context) {
+                              let score = context.raw;
+                              return ' Skor Gejala: ' + score;
+                          },
+                          afterLabel: function(context) {
+                              // Menampilkan Risiko saat di-hover
+                              return ' Status Risiko: ' + riskLevels[context.dataIndex];
+                          }
+                      }
+                  }
+              },
+              scales: {
+                  y: {
+                      beginAtZero: true,
+                      title: { display: true, text: 'Intensitas Keluhan' },
+                      grid: { borderDash: [5, 5] }
+                  },
+                  x: {
+                      grid: { display: false }
+                  }
+              }
+          }
+      });
+  });
+</script>
+{% endif %} {% endblock %}

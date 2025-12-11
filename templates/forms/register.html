@@ -1,14 +1,47 @@
-{% extends 'layouts/form.html' %}
-{% block title %}Register{% endblock %}
-{% block content %}
-  <form method="post" class="form">
-    <h3 class="form-heading">Register <a href="{{ url_for('home') }}" title="Back to homepage"><i class="fa fa-home pull-right"></i></a></h3>
-    {{ form.name(class_ = 'form-control first-input', placeholder = form.name.label.text, required = true, autofocus = true) }}
-    {{ form.email(class_ = 'form-control', placeholder = form.email.label.text, required = true) }}
-    {{ form.password(class_ = 'form-control', placeholder = form.password.label.text, required = true) }}
-    {{ form.confirm(class_ = 'form-control last-input', placeholder = form.confirm.label.text, required = true) }}
-    <p class="pull-left"><a href="{{ url_for('login') }}">Login</a></p>
-    <input type="submit" value="Register" class="btn btn-primary btn-lg btn-block"  disabled>
-    <p>You must add database as well as Flask-Login to enable user management. See the <a href="http://www.realpython.com">Real Python</a> course for more info!</p>
-  </form>
+{% extends 'layouts/form.html' %} {% block title %}Daftar Akun{% endblock %} {%
+block content %}
+<div class="card p-4">
+  <div class="card-body">
+    <h3 class="mb-4 fw-bold text-primary">Buat Akun</h3>
+
+    <form method="post">
+      {{ form.hidden_tag() }}
+
+      <div class="mb-3 text-start">
+        <label class="form-label small text-muted">Nama Lengkap</label>
+        {{ form.name(class_="form-control", placeholder="Nama Anda") }}
+      </div>
+
+      <div class="mb-3 text-start">
+        <label class="form-label small text-muted">Username</label>
+        {{ form.username(class_="form-control", placeholder="Username") }}
+      </div>
+
+      <div class="mb-3 text-start">
+        <label class="form-label small text-muted">Email</label>
+        {{ form.email(class_="form-control", placeholder="name@example.com") }}
+      </div>
+
+      <div class="row">
+        <div class="col-6 mb-3 text-start">
+          <label class="form-label small text-muted">Password</label>
+          {{ form.password(class_="form-control", placeholder="******") }}
+        </div>
+        <div class="col-6 mb-3 text-start">
+          <label class="form-label small text-muted">Ulangi</label>
+          {{ form.confirm(class_="form-control", placeholder="******") }}
+        </div>
+      </div>
+
+      <button class="btn btn-primary w-100 mb-3" type="submit">Daftar</button>
+
+      <p class="small mb-0">
+        Sudah punya akun?
+        <a href="{{ url_for('login') }}" class="text-decoration-none fw-bold"
+          >Login</a
+        >
+      </p>
+    </form>
+  </div>
+</div>
 {% endblock %}
