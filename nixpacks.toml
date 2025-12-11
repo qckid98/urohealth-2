@@ -1,10 +1,15 @@
+# nixpacks.toml
+
 [phases.setup]
 nixPkgs = [
     "python3",
-    "pango",
-    "gobject-introspection",
     "cairo",
-    "gdk-pixbuf"
+    "pango",
+    "gdk-pixbuf",
+    "gobject-introspection",
+    "harfbuzz",       # Wajib untuk rendering teks modern
+    "libffi",
+    "dejavu_fonts"    # WAJIB: Tanpa ini PDF gagal dibuat atau kosong
 ]
 
 [phases.install]
