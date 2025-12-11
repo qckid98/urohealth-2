@@ -275,6 +275,7 @@ def download_pdf(id):
     return response
 
 if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
     port = int(os.environ.get("PORT", 5000))
-    # Host '0.0.0.0' artinya "Terima koneksi dari mana saja (Internet)"
     app.run(host='0.0.0.0', port=port, debug=True)
