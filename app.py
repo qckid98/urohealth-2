@@ -267,11 +267,26 @@ def history():
 @login_required
 def download_pdf(id):
     report = Assessment.query.get_or_404(id)
+    
+    # 1. Format Tanggal (menjadi dd-mm-yyyy)
+    date_str = report.date_posted.strftime('%d-%m-%Y')
+    
+    # 2. Format Nama (Ganti spasi dengan underscore biar tidak error di browser)
+    # Contoh: "Ivan Febriand" -> "Ivan_Febriand"
+    safe_name = current_user.name.replace(" ", "_")
+    
     rendered = render_template('layouts/pdf_template.html', report=report, user=current_user)
     pdf = HTML(string=rendered).write_pdf()
+    
     response = make_response(pdf)
     response.headers['Content-Type'] = 'application/pdf'
-    response.headers['Content-Disposition'] = f'attachment; filename=Laporan_{id}.pdf'
+    
+    # 3. Masukkan Nama & Tanggal ke Filename
+    # Hasil: "Laporan_Ivan_Febriand_12-12-2025.pdf"
+    filename = f"Laporan_{safe_name}_{date_str}.pdf"
+    
+    response.headers['Content-Disposition'] = f'attachment; filename={filename}'
+    
     return response
 
 if __name__ == '__main__':
