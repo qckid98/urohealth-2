@@ -6,10 +6,11 @@ nixPkgs = [
     "cairo",
     "pango",
     "gdk-pixbuf",
+    "glib",                   # <--- INI PERBAIKANNYA (untuk libgobject)
     "gobject-introspection",
-    "harfbuzz",       # Wajib untuk rendering teks modern
-    "libffi",
-    "dejavu_fonts"    # WAJIB: Tanpa ini PDF gagal dibuat atau kosong
+    "harfbuzz",
+    "librsvg",                # Tambahan untuk grafis
+    "dejavu_fonts"            # Wajib untuk font PDF
 ]
 
 [phases.install]
