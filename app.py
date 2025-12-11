@@ -12,6 +12,10 @@ from database import db
 app = Flask(__name__)
 basedir = os.path.abspath(os.path.dirname(__file__))
 db_path = os.path.join(basedir, 'instance', 'database.db')
+instance_folder = os.path.dirname(db_path)
+if not os.path.exists(instance_folder):
+    os.makedirs(instance_folder)
+    print(f"DEBUG: Membuat folder instance di {instance_folder}")
 app.config.from_object('config.Config') # Pastikan Anda punya file config.py
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + db_path
 app.config['SECRET_KEY'] = 'kunci_rahasia_sangat_aman'

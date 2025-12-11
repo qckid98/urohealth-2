@@ -24,6 +24,7 @@ RUN apt-get update && apt-get install -y \
 
 # 3. Setup Folder Kerja
 WORKDIR /app
+RUN mkdir -p instance
 
 # 4. Copy requirements dan install
 COPY requirements.txt .
