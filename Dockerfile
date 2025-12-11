@@ -1,8 +1,9 @@
-# 1. Gunakan Python versi stabil (Linux Debian)
-FROM python:3.10-slim
+# 1. GUNAKAN VERSI BOOKWORM (STABIL)
+# Jangan pakai 'slim' saja, karena bisa nyasar ke versi Trixie/Unstable
+FROM python:3.10-slim-bookworm
 
-# 2. Install Library Sistem yang WAJIB untuk WeasyPrint (Pango, Cairo, GObject)
-# Kita install manual agar tidak ada yang kurang
+# 2. Install Library Sistem (WeasyPrint Dependencies)
+# Di Debian Bookworm, nama-nama paket ini DIJAMIN ada
 RUN apt-get update && apt-get install -y \
     build-essential \
     python3-dev \
@@ -24,13 +25,12 @@ RUN apt-get update && apt-get install -y \
 # 3. Setup Folder Kerja
 WORKDIR /app
 
-# 4. Copy file requirements dan install library Python
+# 4. Copy requirements dan install
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# 5. Copy seluruh kode aplikasi ke dalam container
+# 5. Copy kode aplikasi
 COPY . .
 
-# 6. Jalankan aplikasi menggunakan Gunicorn
-# Railway otomatis memberikan PORT, kita bind ke 0.0.0.0
+# 6. Jalankan Gunicorn
 CMD gunicorn app:app --bind 0.0.0.0:$PORT
