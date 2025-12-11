@@ -92,81 +92,104 @@ def get_ai_advice(score, risk_level, form):
     Fungsi untuk meminta saran klinis ke AI (Sumopod/Custom Endpoint)
     """
     
-    # 1. KONFIGURASI KONEKSI (Sesuai Script Test yang Berhasil)
+    # 1. KONFIGURASI KONEKSI
     client = OpenAI(
         api_key="sk-fXlZncHeFM9wVkUZ-DIdHw",  # API Key Anda
-        base_url="https://ai.sumopod.com/v1"  # PENTING: Pakai /v1
+        base_url="https://ai.sumopod.com/v1"  # Custom Endpoint
     )
     
-    # 2. PERSIAPAN DATA (Agar AI membaca Teks, bukan Angka Kode)
-    # Kita buat helper kecil untuk mengambil label teks dari pilihan
+    # 2. HELPER: Format Data agar terbaca Manusia/AI
     def get_label(field):
         return dict(field.choices).get(field.data) if field.data else "-"
 
-    # Ambil data teks untuk pilihan ganda
+    def fmt_scale(val): 
+        return f"Skala {val}/5" if val else "-"
+
+    # --- AMBIL DATA BAGIAN A (GEJALA KEKAMBUHAN) ---
+    hematuria_txt = get_label(form.hematuria)
+    tidak_tuntas_txt = get_label(form.tidak_tuntas)
+    bb_txt = get_label(form.berat_badan)
+    nyeri_tulang_txt = get_label(form.nyeri_tulang)
+    hematospermia_txt = get_label(form.hematospermia)
+
+    # --- AMBIL DATA BAGIAN B (EFEK SAMPING) ---
     inkontinensia_txt = get_label(form.es_inkontinensia)
     spasms_txt = get_label(form.es_spasms)
     libido_txt = get_label(form.es_libido)
     testis_txt = get_label(form.es_testis)
     rektal_txt = get_label(form.es_rektal)
     
-    # Ambil data input angka/skala
+    # Data Angka (Handle None)
     pad_txt = form.es_pad.data if form.es_pad.data is not None else 0
     hot_flashes_txt = form.es_hot_flashes.data if form.es_hot_flashes.data is not None else 0
-    
-    # Format Skala (misal: "Skala 3" atau "-")
-    def fmt_scale(val): return f"Skala {val}" if val else "-"
+    freq_siang = form.frekuensi_siang.data if form.frekuensi_siang.data is not None else 0
+    nokturia = form.nokturia.data if form.nokturia.data is not None else 0
 
-    # 3. MENYUSUN PROMPT
+    # 3. MENYUSUN PROMPT LENGKAP
     prompt = f"""
     PASIEN: {current_user.name}
     SKOR RISIKO KEKAMBUHAN: {score} (Status: {risk_level})
     
-    LAPORAN KELUHAN EFEK SAMPING & KUALITAS HIDUP:
+    [BAGIAN A] DATA GEJALA VITAL & KEKAMBUHAN:
+    1. Hematuria: {hematuria_txt}
+    2. Urgensi: {fmt_scale(form.urgensi.data)}
+    3. Frekuensi Siang: {freq_siang} kali
+    4. Nokturia (Malam): {nokturia} kali
+    5. Disuria (Nyeri BAK): {fmt_scale(form.disuria.data)}
+    6. Rasa Tidak Tuntas: {tidak_tuntas_txt}
+    7. Penurunan Berat Badan: {bb_txt}
+    8. Nyeri Tulang: {nyeri_tulang_txt}
+    9. Kelelahan Ekstrem: {fmt_scale(form.kelelahan.data)}
+    10. Nyeri Pelvis: {fmt_scale(form.nyeri_pelvis.data)}
+    11. Hematospermia: {hematospermia_txt}
+
+    [BAGIAN B] LAPORAN EFEK SAMPING & KUALITAS HIDUP:
     1. Inkontinensia: {inkontinensia_txt}
     2. Pad Harian: {pad_txt} buah
-    3. Iritasi Kandung Kemih (1-5): {fmt_scale(form.es_iritasi.data)}
+    3. Iritasi Kandung Kemih: {fmt_scale(form.es_iritasi.data)}
     4. Bladder Spasms: {spasms_txt}
-    5. Disfungsi Ereksi (1-5): {fmt_scale(form.es_ereksi.data)}
+    5. Disfungsi Ereksi: {fmt_scale(form.es_ereksi.data)}
     6. Libido: {libido_txt}
     7. Hot Flashes: {hot_flashes_txt} kali/hari
     8. Perubahan Testis: {testis_txt}
-    9. Diare/Pencernaan (1-5): {fmt_scale(form.es_diare.data)}
+    9. Diare/Pencernaan: {fmt_scale(form.es_diare.data)}
     10. Perdarahan Rektal: {rektal_txt}
-    11. Nyeri Perut (1-5): {fmt_scale(form.es_perut.data)}
-    12. Nyeri Pelvis Kronis (1-5): {fmt_scale(form.es_pelvis_kronis.data)}
-    13. Neuropati (1-5): {fmt_scale(form.es_neuropati.data)}
+    11. Nyeri Perut: {fmt_scale(form.es_perut.data)}
+    12. Nyeri Pelvis Kronis: {fmt_scale(form.es_pelvis_kronis.data)}
+    13. Neuropati: {fmt_scale(form.es_neuropati.data)}
     
     TUGAS UNTUK AI:
-    Berikan "Ringkasan Klinis & Saran" untuk laporan PDF pasien. tapi tidak perlu menulis judul Ringkasan Klinis & Saran di jawaban.
+    Berikan saran klinis langsung (tanpa judul "Ringkasan" dll).
     
-    STRUKTUR JAWABAN (Maksimal 2 paragraf pendek):
-    1. IMPLIKASI SKOR: Jelaskan singkat apa artinya status risiko {risk_level} ini bagi pasien.
-    2. MANAJEMEN GEJALA: Pilih 2-3 keluhan paling menonjol dari daftar di atas dan berikan tips medis praktis.
-    3. GAYA BAHASA: Seperti sedang konsultasi, jadi biasakan pakai anda.
-    4. PENUTUP: Jika data aman, berikan apresiasi.
+    STRUKTUR JAWABAN (Maksimal 2 paragraf):
+    1. PARAGRAF 1 (IMPLIKASI): Jelaskan arti status risiko {risk_level} berdasarkan gejala vital di [BAGIAN A]. Fokus pada Hematuria atau Nyeri Tulang jika ada.
+    2. PARAGRAF 2 (MANAJEMEN): Pilih 2 keluhan paling menonjol (skor tinggi) dari [BAGIAN B] atau [BAGIAN A] dan berikan solusi praktis.
     
-    PENTING: Gunakan bahasa Indonesia medis yang sopan. JANGAN menyalin ulang daftar data di atas.
+    GAYA BAHASA:
+    - Gunakan sapaan "Anda" (contoh: "Kondisi Anda saat ini...").
+    - Nada bicara: Dokter yang empatik, tenang, tapi tegas jika ada bahaya.
+    - JANGAN mengulang list data mentah di atas.
     """
+    
+    # 4. MENGIRIM REQUEST
+    print(f"[DEBUG] Mengirim data lengkap ke AI...")
     
     try:
         response = client.chat.completions.create(
-            model="gpt-4o-mini", # Pastikan sama dengan yang berhasil di test_ai.py
+            model="gpt-4o-mini", 
             messages=[
-                {"role": "system", "content": "Anda adalah asisten dokter urologi."},
+                {"role": "system", "content": "Anda adalah dokter urologi profesional."},
                 {"role": "user", "content": prompt}
             ]
         )
-        # Sukses!
         hasil_ai = response.choices[0].message.content
         return hasil_ai
 
     except Exception as e:
-        # Gagal
         print("="*40)
         print(f"[ERROR AI] {e}")
         print("="*40)
-        return "Saran klinis AI tidak tersedia saat ini. Silakan merujuk pada tabel data objektif di bawah."
+        return "Mohon maaf, analisis AI sedang tidak dapat diakses. Silakan konsultasikan tabel data di bawah ini dengan dokter Anda."
 
 # --- ROUTES ---
 
